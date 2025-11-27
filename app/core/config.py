@@ -11,13 +11,11 @@ class Settings(BaseSettings):
 
     APP_ENV: str = "dev"
 
-    # 데이터베이스 접속 URL
-    DATABASE_URL: str
-
-    # 나중에 사용할 Azure 관련 키들
+    # Azure Computer Vision (OCR) 설정
     AZURE_OCR_KEY: str | None = None
     AZURE_OCR_ENDPOINT: str | None = None
 
+    # Azure Speech Service (STT) 설정
     AZURE_TTS_KEY: str | None = None
     AZURE_TTS_ENDPOINT: str | None = None
 
