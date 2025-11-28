@@ -1,36 +1,6 @@
 version: '3.8'
 
 services:
-  # FastAPI 애플리케이션
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: yakkobak-api
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-    env_file:
-      - .env
-    volumes:
-      - ./logs:/app/logs
-    networks:
-      - yakkobak-network
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   # Elasticsearch
   elasticsearch:
     build:

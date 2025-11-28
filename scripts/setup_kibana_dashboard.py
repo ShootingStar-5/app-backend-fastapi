@@ -43,7 +43,7 @@ def create_index_pattern():
     data = {
         "attributes": {
             "title": f"{ES_INDEX}*",
-            "timeFieldName": "metadata.update_date"
+            "timeFieldName": "indexed_at"  # 실제 date 타입 필드 사용
         }
     }
 
@@ -156,7 +156,7 @@ def create_visualization_category_pie():
                         "type": "terms",
                         "schema": "segment",
                         "params": {
-                            "field": "classification.category.keyword",
+                            "field": "classification.category",  # 이미 keyword 타입
                             "size": 10,
                             "order": "desc",
                             "orderBy": "1"
