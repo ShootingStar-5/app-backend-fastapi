@@ -1,8 +1,13 @@
 from typing import List, Union
-from pydantic import AnyHttpUrl, field_validator
+from pydantic import AnyHttpUrl, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
+    """
+    애플리케이션 전역 설정을 관리하는 클래스입니다.
+    환경 변수(.env)를 기반으로 값을 불러옵니다.
+    """
+    
     PROJECT_NAME: str = "Yakkobak"
     API_V1_STR: str = "/api/v1"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
@@ -70,22 +75,11 @@ class Settings(BaseSettings):
     LOG_TO_ELASTICSEARCH: bool = True  # Elasticsearch로 로그 전송 여부
     LOG_ES_INDEX: str = "yakkobak-logs"  # Elasticsearch 로그 인덱스명
 
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
-
-# app/core/config.py
-
-from pydantic_settings import BaseSettings
-
-
-class Settings(BaseSettings):
-    """
-    애플리케이션 전역 설정을 관리하는 클래스입니다.
-    환경 변수(.env)를 기반으로 값을 불러옵니다.
-    """
-
+    # Environment
     APP_ENV: str = "dev"
+    
+    # Docker Settings
+    DOCKER_USERNAME: str = ""
 
     # Azure Computer Vision (OCR) 설정
     AZURE_OCR_KEY: str | None = None
@@ -94,11 +88,19 @@ class Settings(BaseSettings):
     # Azure Speech Service (STT) 설정
     AZURE_TTS_KEY: str | None = None
     AZURE_TTS_ENDPOINT: str | None = None
+    AZURE_SPEECH_REGION: str = "westus3"
 
-    class Config:
-        # 프로젝트 루트에 있는 .env 파일을 자동으로 읽게 합니다.
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # Azure OpenAI 설정
+    AZURE_OPENAI_KEY: str = ""
+    AZURE_OPENAI_ENDPOINT: str = ""
+    AZURE_OPENAI_DEPLOYMENT: str = ""
+
+    model_config = ConfigDict(
+        case_sensitive=True,
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="allow"  # 추가 필드 허용 (Pydantic v2)
+    )
 
 
 # settings 객체를 만들어서 어디서든 import해서 쓸 수 있도록 합니다.
