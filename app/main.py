@@ -34,7 +34,6 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
-
 @app.get("/")
 def root():
     return {"message": "Welcome to Yakkobak API"}
