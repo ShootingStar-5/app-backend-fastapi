@@ -4,6 +4,7 @@ from openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
 import json
+import threading
 
 load_dotenv(override=True)
 
@@ -22,6 +23,7 @@ class AzureSpeechService:
         - 샘플레이트: 16000 Hz
         - 채널: Mono
         - 비트: 16bit
+        - Continuous Recognition 사용 (시니어 사용자를 위해)
         """
         speech_config = speechsdk.SpeechConfig(
             subscription=self.speech_key,
@@ -35,7 +37,12 @@ class AzureSpeechService:
             PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
             "10000"
         )
+        speech_config.set_property(
+            PropertyId.Speech_SegmentationSilenceTimeoutMs,
+            "3000"
+        )
 
+        # WAV 오디오 스트림 설정
         audio_stream = speechsdk.audio.PushAudioInputStream()
         audio_stream.write(audio_data)
         audio_stream.close()
@@ -47,32 +54,62 @@ class AzureSpeechService:
             audio_config=audio_config
         )
 
-        result = speech_recognizer.recognize_once()
+        # Continuous recognition을 위한 변수들
+        all_results = []
+        done = threading.Event()
+        error_message = None
 
-        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        def handle_recognized(evt):
+            """인식 완료된 텍스트 수집"""
+            if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
+                if evt.result.text:
+                    all_results.append(evt.result.text)
+
+        def handle_canceled(evt):
+            """취소/에러 처리"""
+            nonlocal error_message
+            if evt.reason == speechsdk.CancellationReason.Error:
+                error_message = f"오류: {evt.error_details}"
+            done.set()
+
+        def handle_session_stopped(evt):
+            """세션 종료 처리"""
+            done.set()
+
+        # 이벤트 핸들러 연결
+        speech_recognizer.recognized.connect(handle_recognized)
+        speech_recognizer.canceled.connect(handle_canceled)
+        speech_recognizer.session_stopped.connect(handle_session_stopped)
+
+        # Continuous recognition 시작
+        speech_recognizer.start_continuous_recognition()
+
+        # 인식 완료 대기 (최대 60초)
+        done.wait(timeout=60)
+
+        # 인식 중지
+        speech_recognizer.stop_continuous_recognition()
+
+        # 결과 처리
+        if error_message:
+            return {
+                "success": False,
+                "text": "",
+                "message": error_message
+            }
+
+        if all_results:
+            combined_text = " ".join(all_results)
             return {
                 "success": True,
-                "text": result.text,
+                "text": combined_text,
                 "message": "음성 인식 성공"
-            }
-        elif result.reason == speechsdk.ResultReason.NoMatch:
-            return {
-                "success": False,
-                "text": "",
-                "message": "음성을 인식할 수 없습니다"
-            }
-        elif result.reason == speechsdk.ResultReason.Canceled:
-            cancellation = result.cancellation_details
-            return {
-                "success": False,
-                "text": "",
-                "message": f"오류: {cancellation.reason} - {cancellation.error_details}"
             }
         else:
             return {
                 "success": False,
                 "text": "",
-                "message": f"오류: {result.reason}"
+                "message": "음성을 인식할 수 없습니다"
             }
 
 
