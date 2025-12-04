@@ -1,5 +1,5 @@
 # FastAPI 애플리케이션용 Dockerfile
-# Multi-stage build for production optimization
+# Multi-stage build with pre-downloaded models for faster startup
 
 # Stage 1: Builder
 FROM python:3.12-slim as builder
@@ -16,6 +16,12 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
+# 🚀 모델 미리 다운로드 (재시작 시간 단축)
+RUN python -c "from sentence_transformers import SentenceTransformer; \
+    print('Downloading model...'); \
+    model = SentenceTransformer('jhgan/ko-sroberta-multitask'); \
+    print('Model downloaded successfully!')"
+
 # Stage 2: Runtime
 FROM python:3.12-slim
 
@@ -29,6 +35,10 @@ RUN apt-get update && apt-get install -y \
 
 # Builder에서 설치한 패키지 복사
 COPY --from=builder /root/.local /root/.local
+
+# 🚀 Builder에서 다운로드한 모델 캐시 복사
+COPY --from=builder /root/.cache /root/.cache
+
 ENV PATH=/root/.local/bin:$PATH
 
 # Python이 .pyc 파일을 생성하지 않도록 설정
