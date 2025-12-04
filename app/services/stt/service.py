@@ -1,4 +1,5 @@
 import azure.cognitiveservices.speech as speechsdk
+from azure.cognitiveservices.speech import PropertyId
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
@@ -27,6 +28,13 @@ class AzureSpeechService:
             region=self.speech_region
         )
         speech_config.speech_recognition_language = "ko-KR"
+
+        # 시니어 사용자를 위한 침묵 대기 시간 설정 (10초)
+        # 할머니/할아버지가 말 중간에 멈칫해도 끊기지 않도록
+        speech_config.set_property(
+            PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
+            "10000"
+        )
 
         audio_stream = speechsdk.audio.PushAudioInputStream()
         audio_stream.write(audio_data)
