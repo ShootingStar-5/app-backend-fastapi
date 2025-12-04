@@ -9,20 +9,20 @@ uvicorn[standard]>=0.24.0
 # ============================================
 python-dotenv>=1.0.0
 pydantic>=2.5.0
-pydantic-settings    # Pydantic v2에서 Settings 클래스 사용
+pydantic-settings
 
 # ============================================
 # HTTP Client
 # ============================================
-httpx                # 비동기 HTTP 클라이언트 (Azure API 호출용)
+httpx
 requests>=2.31.0
 
 # ============================================
 # Azure Services SDK
 # ============================================
-azure-cognitiveservices-vision-computervision  # Azure Computer Vision (OCR)
-azure-ai-formrecognizer                        # Azure Form Recognizer (고급 OCR)
-azure-cognitiveservices-speech==1.40.0         # Azure Speech Service (STT)
+azure-cognitiveservices-vision-computervision
+azure-ai-formrecognizer
+azure-cognitiveservices-speech==1.40.0
 
 # ============================================
 # Azure OpenAI (LLM)
@@ -48,20 +48,20 @@ numpy>=1.24.3,<2.0.0
 # ============================================
 # File Processing
 # ============================================
-python-multipart>=0.0.9     # 파일 업로드 처리 (FastAPI multipart/form-data)
-pillow                      # 이미지 처리 라이브러리
+python-multipart>=0.0.9
+pillow
 
 # ============================================
 # Google Services
 # ============================================
-google-search-results>=2.4.2  # Google SERP API (serpapi 패키지)
-google-generativeai>=0.8.0    # Google Gemini LLM
-google-genai==1.52.0          # Google GenAI SDK
+google-search-results>=2.4.2
+google-generativeai>=0.8.0
+google-genai==1.52.0
 
 # ============================================
 # Logging for Kibana
 # ============================================
-python-json-logger>=2.0.7  # pythonjsonlogger로도 import됨
+python-json-logger>=2.0.7
 CMRESHandler>=1.0.0
 
 # ============================================
