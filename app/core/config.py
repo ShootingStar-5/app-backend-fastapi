@@ -2,15 +2,15 @@ from typing import List, Union
 from pydantic import AnyHttpUrl, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
-    """
-    애플리케이션 전역 설정을 관리하는 클래스입니다.
-    환경 변수(.env)를 기반으로 값을 불러옵니다.
-    """
+    """애플리케이션 전역 설정을 관리하는 클래스"""
     
+    # Core Settings
     PROJECT_NAME: str = "Yakkobak"
     API_V1_STR: str = "/api/v1"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    APP_ENV: str = "dev"
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
@@ -20,12 +20,29 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
+    # Database
     DATABASE_URL: str = "sqlite:///./sql_app.db"
 
     # Authentication
     SECRET_KEY: str = "changethis"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Azure Computer Vision (OCR)
+    AZURE_OCR_KEY: str | None = None
+    AZURE_OCR_ENDPOINT: str | None = None
+
+    # Azure Speech Service (STT)
+    AZURE_SPEECH_KEY: str | None = None
+    AZURE_SPEECH_REGION: str | None = None
+    AZURE_SPEECH_ENDPOINT: str | None = None
+    AZURE_TTS_KEY: str | None = None
+    AZURE_TTS_ENDPOINT: str | None = None
+
+    # Azure OpenAI (LLM)
+    AZURE_OPENAI_KEY: str | None = None
+    AZURE_OPENAI_ENDPOINT: str | None = None
+    AZURE_OPENAI_DEPLOYMENT: str = "gpt-4o"
 
     # RAG Settings
     FOOD_SAFETY_API_KEY: str = ""
@@ -72,28 +89,11 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FILE: str = "logs/app.log"
-    LOG_TO_ELASTICSEARCH: bool = True  # Elasticsearch로 로그 전송 여부
-    LOG_ES_INDEX: str = "yakkobak-logs"  # Elasticsearch 로그 인덱스명
+    LOG_TO_ELASTICSEARCH: bool = True
+    LOG_ES_INDEX: str = "yakkobak-logs"
 
-    # Environment
-    APP_ENV: str = "dev"
-    
     # Docker Settings
     DOCKER_USERNAME: str = ""
-
-    # Azure Computer Vision (OCR) 설정
-    AZURE_OCR_KEY: str | None = None
-    AZURE_OCR_ENDPOINT: str | None = None
-
-    # Azure Speech Service (STT) 설정
-    AZURE_TTS_KEY: str | None = None
-    AZURE_TTS_ENDPOINT: str | None = None
-    AZURE_SPEECH_REGION: str = "westus3"
-
-    # Azure OpenAI 설정
-    AZURE_OPENAI_KEY: str = ""
-    AZURE_OPENAI_ENDPOINT: str = ""
-    AZURE_OPENAI_DEPLOYMENT: str = ""
 
     model_config = ConfigDict(
         case_sensitive=True,

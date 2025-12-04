@@ -29,7 +29,6 @@ azure-cognitiveservices-speech==1.40.0         # Azure Speech Service (STT)
 # ============================================
 openai>=1.0.0
 
-# ============================================
 # ElasticSearch
 # ============================================
 elasticsearch==8.11.0
@@ -39,6 +38,7 @@ elasticsearch==8.11.0
 # ============================================
 sentence-transformers>=2.2.2
 torch==2.6.0
+tf-keras>=2.16.0
 
 # ============================================
 # Data Processing
@@ -55,7 +55,8 @@ pillow                      # 이미지 처리 라이브러리
 # Google Services
 # ============================================
 google-search-results>=2.4.2  # Google SERP API (serpapi 패키지)
-google-generativeai>=0.8.0     # Google Gemini LLM (google.genai)
+google-generativeai>=0.8.0    # Google Gemini LLM
+google-genai==1.52.0          # Google GenAI SDK
 
 # ============================================
 # Logging for Kibana
